@@ -10,6 +10,8 @@ pymatgen==2020.8.13
 pymongo==3.11.0
 ruamel.base==1.0.0
 jinja2==2.11.2
-markupsafe==1.1.1
+# markupsafe==1.1.1
 itsdangerous==1.1.0
 werkzeug==1.0.1
+# add a git repo https://github.com/tsaie79/qubitPack
+qubitPack @ git+https://github.com/tsaie79/qubitPack@master
