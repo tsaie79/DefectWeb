@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block title %}{{app_title}}{% endblock %}
+
+{% block top_javascript %}
+{#<script src="{{ url_for('static', filename='js/renderjson.js') }}"></script>#}
+<script src="/static/js/renderjson.js"></script>
+<script src="/static/js/3Dmol-nojquery-min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+    $.get("/{{ collection_name }}/doc_cdft/{{doc_id}}/json", function( data ) {
+      document.getElementById("doc").appendChild(
+        renderjson.set_show_by_default(false)
+                  .set_show_to_level(0)
+                  .set_sort_objects(false)
+                  .set_icons('+', '-')
+                  .set_max_string_length(20)(data));
+    });
+
+  });
+</script>
+
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css" />
+    <link rel="shortcut icon" href="/static/images/favicon.png"/>
+    <link rel=stylesheet type=text/css
+          href="/static/style.css">
+
+<link rel=stylesheet type=text/css
+          href="{{ url_for('static', filename='index.css') }}">
+    <style>
+      .renderjson a { text-decoration: none; }
+      .renderjson .disclosure { color: crimson;
+                                font-size: 150%; }
+      .renderjson .syntax { color: grey; }
+      .renderjson .string { color: darkred; }
+      .renderjson .number { color: darkcyan; }
+      .renderjson .boolean { color: blueviolet; }
+      .renderjson .key    { color: darkblue; }
+      .renderjson .keyword { color: blue; }
+      .renderjson .object.syntax { color: lightseagreen; }
+      .renderjson .array.syntax  { color: orange; }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+<h2>Collection: {{collection_name}}, Task_id: {{doc_id}}</h2>
+
+<div style="float: left">
+
+<div>SCF-task_id: {{ doc.taskid }}</div><br/>
+
+<h4>ZPL (eV), ZPL_wavelength (nm)</h4>
+<img style="width:400px; height:400px" src="/static/images/cdft.png"><br>
+<div>AB, CD: vertial transitions</div><br>
+<div>BC, DA: relaxations in the excited and ground manifolds</div><br>
+<div>{{ cdft }}</div><br/>
+<h4>Dipole_transition_rate - up_channel (MHz)</h4>
+<div>{{ up }}</div><br/>
+<h4>Dipole_transition_rate - down_channel (MHz)</h4>
+<div>{{ down }}</div><br/>
+<h4>CDFT_calculation_information</h4>
+<div>{{ basic_info }}</div><br>
+
+<h4>Full document</h4>
+<div>Rendered JSON (click +/- to expand/collapse):</div>
+<div id="doc">
+
+</div>
+
+<br/><br/><br/>
+
+</div>
+
+{% endblock %}

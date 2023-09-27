@@ -1,0 +1,212 @@
+# Provide an optional title for your app.
+title: "Symmetry-enabled quantum defects"
+
+# Provide some optional help text (html format) for the query.
+help: "Supported queries: task_id (int)"
+
+# Uncomment the parameter below to provide an optional template folder, which
+# will be passed into the Flamyngo app. Path to the template folder should be
+# specified relative to localtion where flm is run. If not provided, the
+# default provided in the flamyngo.templates will be used. It is highly
+# recommended that you start from the default provided and make only stylistic
+# changes. It is imperative you do not change the variable names in the Jinja
+# templates or Flamyngo will not work.
+
+template_folder: /Volumes/JengStorage/Research/Project/HT_defect_Web/r2SCAN/templates
+#/home/tsai/site-packages/flamyngo_Scan2dDefect/flamyngo/templates
+
+# MongoDB settings
+db:
+  host: localhost
+  port: 12349
+  username: web_r
+  password: qiminyan
+  database: Scan2dDefect
+# Alternatively, MongoDB settings can just be provided as a connection string.
+# dnspython must be installed if you are using the connection string method.
+#  connection_string: "mongodb+srv://user:password@mydb.mongodb.net/"
+
+
+# List of collection settings. Note that more than one collection is supported,
+# though only one collection can be queried at any one time.
+collections:
+  -
+    name: calc_data
+
+    # These set the special queries as an ordered list of [<key>, <regex string>, <type>].
+    # If the query string satisfies any of the regex, the Mongo query is set as
+    # {<key>: type(<search_string>)}. This allows for much more friendly setups for common
+    # queries that do not require a user to type in verbose Mongo criteria. Each
+    # regex should be uniquely identifying.
+    # Types can be any kind of callable function that takes in a string and return
+    # a value without other arguments. E.g., int, str, float, etc. You can support
+    # more powerful conversions by writing your own processing function, e.g.,
+    # mymodule.convert_degress_to_radians.
+    # If none of the regex works, the criteria is interpreted as a Mongo-like dict query.
+    query:
+      - [task_id, '[-+]?\d*\.\d+|\d+', int ] # add regex of finding integer
+      - [chemsys, '\w+-\w+', str] # add regex of finding string
+
+    # A default list of projection key, processing function to display as a table.
+    # Again, processing function can be any callable, and you can define your own.
+    # You can also supply any Python formatting string (starts with %) as the processing
+    # function. For example, "%.1f" would format that quantity as a float with one
+    # decimal.
+    summary:
+#      - [_id, str]
+      - [task_id, "%d"]
+      - [formula_pretty, str]
+      - [defect_entry.name, str]
+      - [defect_entry.defect_type, str]
+      - [calcs_reversed.0.output.outcar.total_magnetization, "%.2f"]
+      - [output.spacegroup.point_group, str]
+      - [ charge_state, int ]
+      - [ data_web.bandgap_df.bandgap.0, "%.3f" ]
+      - [ data_web.up_tran.0.up_tran_en, "%.3f" ]
+      - [ data_web.dn_tran.0.dn_tran_en, "%.3f" ]
+#      - [ NN, list ]
+      - [chemsys, str]
+      - [host_info.c2db_info.uid, str]
+      - [host_info.scan_bs.bandgap, "%.3f"]
+#      - [pc_from, str]
+      - [ host_info.sym_data.pmg_spg, str ]
+
+
+
+    # Aliases for various fields. These are used to display short names in the summary
+    # table. You can also directly perform queries using the short names instead of
+    # using the long names.
+    aliases:
+      _id: ID
+      task_id: task_id
+      calcs_reversed.0.output.outcar.total_magnetization: mag
+      defect_entry.name: defect_name
+      defect_entry.defect_type: defect_type
+      output.spacegroup.point_group: point_group
+      host_info.sym_data.pmg_spg: spacegroup
+      data_web.threshold_tot_proj: threshold_tot_proj
+      data_web.up_tran.0.up_tran_en: up_tran
+      data_web.dn_tran.0.dn_tran_en: dn_tran
+      data_web.bandgap_df.bandgap.0: perturbed_gap
+      host_info.scan_bs.bandgap: SCAN_gap
+      host_info.c2db_info.formula: host_formula
+      host_info.c2db_info.uid: host_uid
+
+
+    # Initial sorting for summary. Use asc for ascending and desc for descending.
+    # Note that the aliased name (if any) should be used for sorting.
+    sort: [charge_state, asc]
+
+    # The following defines unique identifiers for each doc. This allows each
+    # specific doc to be queried and displayed using this key. If this key is
+    # present in the default list of projections, a link will be created to each
+    # unique document.
+    unique_key: task_id #_id
+    unique_key_type: int #bson.objectid.ObjectId
+
+    # The following defines a filter criteria that will be applied to all queries.
+    # This allows presenting only a subset of a database.
+    filter_criteria:
+      task_label: SCAN_scf
+    exclude_entries: ['60e63540a9ddf2d792d83642', '60e6bd67a9ddf2d792dac315', '60e6bf6ba9ddf2d792dad0e1',
+                      '60e6c2f8a9ddf2d792dae92c', '60e6d4a0a9ddf2d792db657f', '60e72365a9ddf2d792dcb86a',
+                      '60e724a6a9ddf2d792dcbf96', '60e725e7a9ddf2d792dcc7fa', '60e72b00a9ddf2d792dcec53',
+                      '60e89d64a9ddf2d792e46080', '60e8a070a9ddf2d792e4748f', '60e8a0b3a9ddf2d792e4765f',
+                      '60e8a2dba9ddf2d792e4850c', '60e8a6a0a9ddf2d792e49d9e', '60e8aaa4a9ddf2d792e4b69a',
+                      '60e8aad7a9ddf2d792e4b81c', '60e8ae01a9ddf2d792e4cd97', '60e8b2bea9ddf2d792e4f086',
+                      '60e8b495a9ddf2d792e4fe08', '60e8b997a9ddf2d792e52471', '60e8bcf2a9ddf2d792e53d28',
+                      '60e8bd2aa9ddf2d792e53eae', '60e8c389a9ddf2d792e57226', '60e8d52ea9ddf2d792e5e891',
+                      '60e97d34a9ddf2d792e891ae', '60e9805fa9ddf2d792e89f81', '60e9a583a9ddf2d792e939f7',
+                      '60e9b23da9ddf2d792e96a3e', '60eab507a9ddf2d792ec7666', '60eac24fa9ddf2d792ecb5d7',
+                      '60eac556a9ddf2d792ecc3cd', '60eaca9aa9ddf2d792ecd840', '60ead040a9ddf2d792eced49',
+                      '60eae1c7a9ddf2d792ed2590', '60eb0dcda9ddf2d792ed90f4', '60edd950a9ddf2d792f4f922',
+                      '60eddeb9a9ddf2d792f51cfd', '60eddf64a9ddf2d792f5217c', '60edf362a9ddf2d792f5965f',
+                      '60edf5efa9ddf2d792f5a634', '60edf7f4a9ddf2d792f5b45e', '60edf8a8a9ddf2d792f5b924',
+                      '60edfa6ca9ddf2d792f5c666', '60edfa71a9ddf2d792f5c69e', '60edfc84a9ddf2d792f5d72b',
+                      '60edfcd2a9ddf2d792f5d9b7', '60edff4ea9ddf2d792f5eca2', '60edff87a9ddf2d792f5ee84',
+                      '60ee0031a9ddf2d792f5f30e', '60ee00d7a9ddf2d792f5f782', '60ee013ea9ddf2d792f5faa6',
+                      '60ee014da9ddf2d792f5fb1b', '60ee035ea9ddf2d792f6091f', '60ee0383a9ddf2d792f60a20',
+                      '60ee4032a9ddf2d792f71558', '60ee42bca9ddf2d792f71fce', '60ee43baa9ddf2d792f72448',
+                      '60ee465ba9ddf2d792f72fac', '60ee4a80a9ddf2d792f742c8', '60ee4af8a9ddf2d792f7454f',
+                      '60ee4cd7a9ddf2d792f74f05', '60ee4d3fa9ddf2d792f750c1', '60ee4d5ea9ddf2d792f751da',
+                      '60ee4f55a9ddf2d792f75b3d', '60ee4f77a9ddf2d792f75c57', '60ee501ea9ddf2d792f76030',
+                      '60ee5121a9ddf2d792f76526', '60ee513da9ddf2d792f76606', '60ee5174a9ddf2d792f7674e',
+                      '60ee52b4a9ddf2d792f76d41', '60ee549fa9ddf2d792f776a5', '60f84022a9ddf2d792071692',
+                      '61121a4ca9ddf2d7924c24a2', '61137ac6a9ddf2d79251d0dc', '611380e9a9ddf2d79251e665',
+                      '611395b7a9ddf2d792522969', '61139630a9ddf2d792522aee', '6113ae60a9ddf2d792527383',
+                      '6113e009a9ddf2d7925302b2', '611feeafa9ddf2d79263436b']
+
+
+    # The following defines keys to exclude from the doc view.
+    # This is sometimes useful (or necessary) to reduce the size of the
+    # individual documents being viewed (for very large documents).
+    # This only affects the doc view.
+    doc_exclude:
+      - key_to_exclude
+  -
+    name: ir_data
+
+    # These set the special queries as an ordered list of [<key>, <regex string>, <type>].
+    # If the query string satisfies any of the regex, the Mongo query is set as
+    # {<key>: type(<search_string>)}. This allows for much more friendly setups for common
+    # queries that do not require a user to type in verbose Mongo criteria. Each
+    # regex should be uniquely identifying.
+    # Types can be any kind of callable function that takes in a string and return
+    # a value without other arguments. E.g., int, str, float, etc. You can support
+    # more powerful conversions by writing your own processing function, e.g.,
+    # mymodule.convert_degress_to_radians.
+    # If none of the regex works, the criteria is interpreted as a Mongo-like dict query.
+    query:
+      - [task_id, '[-+]?\d*\.\d+|\d+', int ] # add regex of finding integer
+    # A default list of projection key, processing function to display as a table.
+    # Again, processing function can be any callable, and you can define your own.
+    # You can also supply any Python formatting string (starts with %) as the processing
+    # function. For example, "%.1f" would format that quantity as a float with one
+    # decimal.
+    summary:
+      - [task_id, "%d"]
+      - [formula, str]
+      - [post_relax_sg_name.0, str]
+      - [post_relax_sg_number, int]
+      - [prev_fw_taskid, int]
+
+
+    # Aliases for various fields. These are used to display short names in the summary
+    # table. You can also directly perform queries using the short names instead of
+    # using the long names.
+    aliases:
+      task_id: task_id
+      post_relax_sg_name.0: pg
+      post_relax_sg_number: pg_number
+
+    # Initial sorting for summary. Use asc for ascending and desc for descending.
+    # Note that the aliased name (if any) should be used for sorting.
+    sort: [task_id, asc]
+
+    # The following defines unique identifiers for each doc. This allows each
+    # specific doc to be queried and displayed using this key. If this key is
+    # present in the default list of projections, a link will be created to each
+    # unique document.
+    unique_key: task_id
+    unique_key_type: int
+
+    # The following defines a filter criteria that will be applied to all queries.
+    # This allows presenting only a subset of a database.
+    filter_criteria:
+      task_label: irvsp
+
+
+    # The following defines keys to exclude from the doc view.
+    # This is sometimes useful (or necessary) to reduce the size of the
+    # individual documents being viewed (for very large documents).
+    # This only affects the doc view.
+    doc_exclude:
+      - key_to_exclude
+#
+
+# Basic auth can be set up by specifying user and password below. If these are not
+# set, then no authentication. Note that this is not the most secure. It is merely
+# used for a basic setup. For high security, look into proper implementations.
+AUTH_USER: #Qimin
+AUTH_PASSWD: #qimin
+API_KEY: #qimin

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="db2" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="db2">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/tsai/site-packages/HT_defect_Web/r2SCAN" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath path="/home/tsai/site-packages/HT_defect_Web/r2SCAN/static/materials" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
