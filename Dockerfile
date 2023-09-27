@@ -1,28 +1,14 @@
-# create a image based on alpine
+# base image for python 3.7
 
-FROM alpine:3.10
+FROM python:3.7-slim-buster
 
+# install pip 
 
-# install miniconda and add it to the path
+RUN apt-get update && apt-get install -y python3-pip
 
-RUN apk update && apk add wget && \
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-    sh Miniconda3-latest-Linux-x86_64.sh -b -p /usr/local/miniconda3 && \
-    rm Miniconda3-latest-Linux-x86_64.sh && \
-    ln -s /usr/local/miniconda3/bin/conda /usr/local/bin/conda
+# install git
 
-# add conda-forge to the channels
-
-RUN conda config --add channels conda-forge
-
-
-# install git, less and vim
-
-RUN apk update && apk add git less vim
-
-# install dependencies for cython
-
-RUN apk update && apk add make automake gcc g++ subversion python3-dev
+RUN apt-get install -y git
 
 # install dependencies based on requirements.txt
 
