@@ -14,8 +14,8 @@ RUN apk update && apk add make automake gcc g++ subversion python3-dev
 
 COPY requirements.txt /tmp/requirements.txt
 # update pip
-RUN pip3 install --upgrade pip3
-RUN pip3 install -r /tmp/requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r /tmp/requirements.txt
 
 # copy the source code to the container
 
