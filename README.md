@@ -14,4 +14,4 @@ This website is for demostration of defect databases containing the following in
 ## Deploy the website
 1. Install the required packages in `requirements.txt`.
 2. Copy the this `r2SCAN` or `HSE` folder to site-packages of your python environment, and rename it as `flamyngo`.
-3. Go to the directory `flamyngo` and run `flm -c config.yaml` to deploy the website.`
+3. Go to the directory `flamyngo` and run `flm -c config.yaml` to deploy the website.
