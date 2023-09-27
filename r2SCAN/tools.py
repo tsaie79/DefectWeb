@@ -13,9 +13,6 @@ from qubitPack.qc_searching.analysis.main import RunDefectState
 import time
 from concurrent.futures import ProcessPoolExecutor
 
-# from flamyngo_Scan2dDefect.flamyngo import __file__
-# __file__ = os.path.abspath(os.path.dirname(__file__))
-
 # get the path of the python file
 __file__ = os.path.abspath(os.path.dirname(__file__))
 
@@ -195,21 +192,3 @@ def generate_all_figures():
 
 if __name__ == "__main__":
     generate_all_figures()
-
-    # from concurrent.futures import ProcessPoolExecutor
-    # import time
-    # values = [2,3,4,5]
-    # def square(n):
-    #     print(n)
-    #     time.sleep(60)
-    #     return n * n
-    # def main():
-    #     t1 = time.perf_counter()
-    #     with ProcessPoolExecutor(max_workers=3) as executor:
-    #         results = executor.map(square, values)
-    #     for result in results:
-    #         print(result)
-    #     t2 = time.perf_counter()
-    #     print("time: ", t2 - t1)
-    
-    # main()
