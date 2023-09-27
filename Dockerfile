@@ -15,25 +15,25 @@ RUN apk update && apk add make automake gcc g++ subversion python3-dev
 COPY requirements.txt /tmp/requirements.txt
 # update pip
 RUN pip install --upgrade pip
-RUN pip install -r /tmp/requirements.txt
+# RUN pip install -r /tmp/requirements.txt
 
-# copy the source code to the container
+# # copy the source code to the container
 
-COPY . /app
-WORKDIR /app
+# COPY . /app
+# WORKDIR /app
 
-# run the application and expose port 5000
+# # run the application and expose port 5000
 
-EXPOSE 5000
+# EXPOSE 5000
 
-# cp r2SCAN to site-packages and rename it to flamyngo
+# # cp r2SCAN to site-packages and rename it to flamyngo
 
-RUN cp -r r2SCAN /usr/local/lib/python3.7/site-packages/flamyngo
+# RUN cp -r r2SCAN /usr/local/lib/python3.7/site-packages/flamyngo
 
-# change the working directory to flamyngo
+# # change the working directory to flamyngo
 
-WORKDIR /usr/local/lib/python3.7/site-packages/flamyngo
+# WORKDIR /usr/local/lib/python3.7/site-packages/flamyngo
 
-# run the application by flm -c config.yaml
+# # run the application by flm -c config.yaml
 
-CMD ["flm", "-c", "config.yaml"]
+# CMD ["flm", "-c", "config.yaml"]
