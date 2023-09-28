@@ -12,7 +12,7 @@ help: "Supported queries: task_id (int)"
 # changes. It is imperative you do not change the variable names in the Jinja
 # templates or Flamyngo will not work.
 
-template_folder: /Volumes/JengStorage/Research/Project/HT_defect_Web/r2SCAN/templates
+template_folder: /usr/local/lib/python3.7/site-packages/flamyngo/templates #/Volumes/JengStorage/Research/Project/HT_defect_Web/r2SCAN/templates
 #/home/tsai/site-packages/flamyngo_Scan2dDefect/flamyngo/templates
 
 # MongoDB settings
