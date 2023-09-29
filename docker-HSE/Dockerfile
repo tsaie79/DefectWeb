@@ -41,13 +41,17 @@ RUN pip install flamyngo
 RUN pip install monty==3.0.2
 RUN pip install ipython
 
+RUN git clone https://github.com/tsaie79/JPack.git /usr/local/lib/python3.7/site-packages/JPack
+RUN pip install sklearn
+
+
 # cp r2SCAN to site-packages and rename it to flamyngo
 WORKDIR /app
-RUN mv r2SCAN /usr/local/lib/python3.7/site-packages
+RUN mv HSE /usr/local/lib/python3.7/site-packages
 WORKDIR /usr/local/lib/python3.7/site-packages
 # rename r2SCAN to flamyngo
 RUN rm -rf flamyngo/*
-RUN mv r2SCAN/* flamyngo/
+RUN mv HSE/* flamyngo/
 
 # # change the working directory to flamyngo
 
