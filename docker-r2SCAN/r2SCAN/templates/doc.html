@@ -1,0 +1,152 @@
+{% extends "layout.html" %}
+
+{% block title %}{{app_title}}{% endblock %}
+
+{% block top_javascript %}
+{#<script src="{{ url_for('static', filename='js/renderjson.js') }}"></script>#}
+<script src="/static/js/renderjson_orig.js"></script>
+<script src="/static/js/3Dmol-nojquery-min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+    $.get("/{{ collection_name }}/doc/{{doc_id}}/json", function( data ) {
+      document.getElementById("doc").appendChild(
+        renderjson.set_show_by_default(false)
+                  .set_show_to_level(0)
+                  .set_sort_objects(false)
+                  .set_icons('+', '-')
+                  .set_max_string_length(20)(data));
+    });
+
+  });
+</script>
+
+<!-- Visualize Structure -->
+<script>
+$(function() {
+  let element = $('#viewer');
+  let config = { backgroundColor: 'grey', defaultcolors: $3Dmol.elementColors.Jmol, orthographic: true, ui: true};
+{#  let config = { backgroundColor: 'black'}; <!--, defaultcolors: $3Dmol.elementColors.Jmol };-->#}
+  let viewer = $3Dmol.createViewer( element, config );
+  xyzUri = "/static/materials/{{ doc_id }}.cif";
+  jQuery.ajax( xyzUri, {
+    success: function(data) {
+      console.log(data);
+      let v = viewer;
+      v.addModel( data, "cif" );
+      v.addUnitCell();
+    v.addPropertyLabels("elem", {}, {fontColor:'white',font: 'sans-serif', fontSize:
+    12, showBackground:false,alignment:'center'});
+
+      v.setStyle({}, {sphere: {scale: 0.25}, stick: {radius: 0.08}, });
+      v.addArrow({
+        start: {x:{{ lattice_info.Ox }}, y:{{ lattice_info.Oy }}, z:{{ lattice_info.Oz }}},
+        end: {x:{{ lattice_info.v1x }}, y:{{ lattice_info.v1y }}, z:{{ lattice_info.v1z }}},
+        radius: 0.15, color: "red"
+      });
+      v.addLine({
+        start: {x:{{ lattice_info.v2x }}, y:{{ lattice_info.v2y }}, z:{{ lattice_info.v2z }}},
+        end: {x:{{ lattice_info.v1x }}+{{ lattice_info.v2x }}, y:{{ lattice_info.v1y }}+{{ lattice_info.v2y }}, z:{{
+        lattice_info.v1z }}}, color: "black", radius: 0.15
+      });
+      v.addArrow({
+        start: {x:{{ lattice_info.Ox }}, y:{{ lattice_info.Oy }}, z:{{ lattice_info.Oz }}},
+        end: {x:{{ lattice_info.v2x }}, y:{{ lattice_info.v2y }}, z:{{ lattice_info.v2z }}},
+        radius: 0.15, color: "green"
+      });
+      v.addLine({
+        start: {x:{{ lattice_info.v1x }}, y:{{ lattice_info.v1y }}, z:{{ lattice_info.v1z }}},
+        end: {x:{{ lattice_info.v1x }}+{{ lattice_info.v2x }}, y:{{ lattice_info.v1y }}+{{ lattice_info.v2y }}, z:{{
+        lattice_info.v1z }}}, color: "black", radius: 0.15
+        });
+      v.addArrow({
+        start: {x:{{ lattice_info.Ox }}, y:{{ lattice_info.Oy }}, z:{{ lattice_info.Oz }}},
+        end: {x:{{ lattice_info.v3x }}, y:{{ lattice_info.v3y }}, z:{{ lattice_info.v3z }}},
+        radius: 0.15, color: "blue"
+      });
+
+      v.zoomTo();
+      v.render();
+<!--
+      v.zoom(2, 1000);
+      v.rotate(180, "x", 10);
+      v.rotate(180, "y", 10);
+      v.rotate(180, "z", 10);
+-->
+    },
+    error: function(hdr, status, err) {
+      console.error( "Failed to load XYZ " + pdbXYZ + ": " + err );
+    },
+  });
+});
+</script>
+
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css" />
+    <link rel="shortcut icon" href="/static/images/favicon.png"/>
+    <link rel=stylesheet type=text/css
+          href="/static/style.css">
+
+<link rel=stylesheet type=text/css
+          href="{{ url_for('static', filename='index.css') }}">
+    <style>
+      .renderjson a { text-decoration: none; }
+      .renderjson .disclosure { color: crimson;
+                                font-size: 150%; }
+      .renderjson .syntax { color: grey; }
+      .renderjson .string { color: darkred; }
+      .renderjson .number { color: darkcyan; }
+      .renderjson .boolean { color: blueviolet; }
+      .renderjson .key    { color: darkblue; }
+      .renderjson .keyword { color: blue; }
+      .renderjson .object.syntax { color: lightseagreen; }
+      .renderjson .array.syntax  { color: orange; }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+<h2>Collection: {{collection_name}}, Task_id: {{doc_id}}</h2>
+
+<div style="width: 100%; height: 50%; float: left" class="viewer_3Dmoljs" id="viewer"></div><br>
+
+<div style="float: left">
+<h4>Information</h4>
+<div>Host_from: {{ doc.pc_from }}</div><br/>
+<div>Spacegroup: {{ doc.host_info.sym_data.pmg_spg }} ({{ doc.host_info.sym_data.pmg_spg_number }})</div><br/>
+<div>Host_sites: {{ doc.host_info.sym_data.unique_wyckoff.species}}:{{ doc.host_info.sym_data.unique_wyckoff
+.site_sym}} / {{ doc.host_info.sym_data.good_ir_info.species }}:{{ doc.host_info.sym_data.good_ir_info.site_sym
+        }}</div><br/>
+<div>Defect_type: {{ doc.defect_entry.defect_type }}</div><br/>
+<div>Formula: {{ doc.formula_pretty }}</div><br/>
+<div>Defect_name: {{ doc.defect_entry.name }}</div><br/>
+<div>Charge_state: {{ doc.charge_state }}</div><br/>
+<div>Magnetic_moment: {{ doc.calcs_reversed.0.output.outcar.total_magnetization }} &mu;<sub>B</sub>/unit cell</div></br>
+<div>Point_group: {{ doc.output.spacegroup.point_group }} </div><br/>
+
+<h4>Perturbed band edges</h4>
+<div>{{ perturbed_bandedge_df }}</div><br>
+<div>{{ bandgap_df }}</div><br>
+
+<h4>Defect levels</h4>
+<div>Symmetry notations from IR document: <a target="_blank" href="{{ ir_url }}">{{ ir_taskid }}</a></div><br>
+<img style="width:864px; height:792px" src="/static/materials/{{ doc_id }}.png"><br/>
+<img style="width:900px; height:450px" src="/static/materials/{{ doc_id }}_ipr.png">
+    <div>{{ up_in_gap_df }}</div><br>
+    <div>{{ dn_in_gap_df }}</div><br>
+    <div>{{ up_tran_df }}</div><br>
+    <div>{{ dn_tran_df }}</div><br>
+
+<h4>IR document</h4>
+<div>IR_data: <a target="_blank" href="{{ ir_url }}">{{ ir_taskid }}</a></div><br/>
+
+<h4>Full document</h4>
+<div>Rendered JSON (click +/- to expand/collapse):</div>
+<div id="doc">
+
+</div>
+
+<br/><br/><br/>
+
+</div>
+
+{% endblock %}

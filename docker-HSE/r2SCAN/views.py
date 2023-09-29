@@ -27,13 +27,13 @@ from pymatgen.io.vasp.inputs import Structure
 
 # from qubitPack.qc_searching.analysis.main import RunDefectState
 
-# from HT_defect_web.flamyngo.tools import get_ev
-
-# from HT_defect_web.flamyngo import __file__
+# from flamyngo_Scan2dDefect.flamyngo import __file__
 from flamyngo import __file__
-__file__ = os.path.abspath(os.path.dirname(__file__))
 
+__file__ = os.path.abspath(os.path.dirname(__file__))
+print(f"__file__ = {__file__}")
 SETTINGS = loadfn(os.environ["FLAMYNGO"])
+
 APP_TITLE = SETTINGS.get("title", "Flamyngo")
 HELPTXT = SETTINGS.get("help", "")
 TEMPLATE_FOLDER = SETTINGS.get("template_folder", "templates")
@@ -372,45 +372,14 @@ def get_doc(collection_name, uid):
                 "v1x": end[0][0], "v1y": end[0][1], "v1z": end[0][2], "v2x": end[1][0], "v2y": end[1][1],
                 "v2z": end[1][2], "v3x": end[2][0], "v3y": end[2][1], "v3z": end[2][2]}
 
-    def get_singlet_triplet_docs():
-        singlet_criteria = {
-            "nupdown_set":0,
-            "pc_from": doc["pc_from"],
-            "charge_state": doc["charge_state"],
-            "defect_entry.name": doc["defect_entry"]["name"],
-            "task_label": "HSE_scf"
-        }
-        singlet_doc = DB[collection_name].find_one(singlet_criteria)
-
-
-        triplet_criteria = {
-            "nupdown_set":2,
-            "pc_from": doc["pc_from"],
-            "charge_state": doc["charge_state"],
-            "defect_entry.name": doc["defect_entry"]["name"],
-            "task_label": "HSE_scf"
-        }
-        triplet_doc = DB[collection_name].find_one(triplet_criteria)
-        singlet_triplet_energy_diff = triplet_doc["output"]["energy"] - singlet_doc["output"]["energy"]
-        return singlet_doc, triplet_doc, round(singlet_triplet_energy_diff*1000)
 
     def get_ir_data():
-        ir_entry = DB['ir_data-pbe_pc'].find_one({'prev_fw_taskid': doc['task_id']})
+        filter = {"pc_from_id": doc["pc_from_id"], "defect_name": doc["defect_name"],
+        "charge_state": doc["charge_state"]}
+        ir_entry = DB['ir_data'].find_one(filter)
         ir_taskid = ir_entry['task_id']
-        ir_url = f"/ir_data-pbe_pc/doc_ir/{ir_taskid}"
+        ir_url = f"/ir_data/doc_ir/{ir_taskid}"
         return ir_taskid, ir_url
-
-    def get_zfs_data():
-        zfs_entry = DB['zfs_data-pbe_pc'].find_one({'prev_fw_taskid': doc['task_id']})
-        zfs_taskid = zfs_entry['task_id']
-        zfs_url = f"/zfs_data-pbe_pc/doc_zfs/{zfs_taskid}"
-        return zfs_taskid, zfs_url
-
-    def get_cdft_data():
-        cdft_entry = DB['cdft-pbe_pc'].find_one({'taskid': doc['task_id'], "task_label": "CDFT-B-HSE_scf"})
-        cdft_taskid = cdft_entry['task_id']
-        cdft_url = f"/cdft-pbe_pc/doc_cdft/{cdft_taskid}"
-        return cdft_taskid, cdft_url
 
     def get_ev_ipr():
         with cd(os.path.join(__file__, "static", "materials")):
@@ -418,11 +387,11 @@ def get_doc(collection_name, uid):
                 return None
 
             calc_db = {
-                "db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "calc_data-pbe_pc", "port": 27017,
+                "db_name": "Scan2dDefect", "collection_name": "calc_data", "port": 12349,
                 "user": "Jeng_ro"
             }
             ir_db = {
-                "db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "ir_data-pbe_pc", "port": 27017,
+                "db_name": "Scan2dDefect", "collection_name": "ir_data", "port": 12349,
                 "user": "Jeng_ro"
             }
             run_defect_state = RunDefectState(
@@ -445,13 +414,10 @@ def get_doc(collection_name, uid):
                 threshold=0.2,
                 defect_plot=None,#"eigen",
                 threshold_from="tot_proj",
-                edge_tol=(.5, .5),)
-            print(perturbed_bandedge_df)
-
+                edge_tol=(0.25, 0.25)
+                )
             bandgap_df = pd.DataFrame({"bandgap": [perturbed_bandedge_df.iloc[1]["energy"] -
                                                    perturbed_bandedge_df.iloc[0]["energy"]]})
-            print(bandgap_df)
-            print(perturbed_bandedge_df)
             perturbed_bandedge_df.to_json(f"{uid}_perturbed_bandedge_df.json")
             bandgap_df.to_json(f"{uid}_bandgap_df.json")
 
@@ -505,52 +471,22 @@ def get_doc(collection_name, uid):
         bandgap_df = Markup(bandgap_df.to_html(index=False))
 
     lattice_info = get_structure_info()
-    singlet_doc, triplet_doc, singlet_triplet_energy_diff = get_singlet_triplet_docs()
-    try:
-        zfs_taskid, zfs_url = get_zfs_data()
-    except:
-        zfs_taskid, zfs_url = None, f"/{collection_name}/doc/{uid}"
+
     try:
         ir_taskid, ir_url = get_ir_data()
     except:
         ir_taskid, ir_url = None, f"/{collection_name}/doc/{uid}"
-    try:
-        cdft_taskid, cdft_url = get_cdft_data()
-    except:
-        cdft_taskid, cdft_url = None, f"/{collection_name}/doc/{uid}"
 
     return make_response(
         render_template(
             "doc.html", collection_name=collection_name, doc_id=uid, app_title=APP_TITLE, doc=doc,
-            lattice_info=lattice_info, singlet_triplet_energy_diff=singlet_triplet_energy_diff,
-            singlet_doc=singlet_doc, triplet_doc=triplet_doc, zfs_taskid=zfs_taskid, zfs_url=zfs_url,
+            lattice_info=lattice_info,
             ir_taskid=ir_taskid, ir_url=ir_url, up_in_gap_df=up_in_gap_df, dn_in_gap_df=dn_in_gap_df,
             up_tran_df=up_tran_df, dn_tran_df=dn_tran_df, perturbed_bandedge_df=perturbed_bandedge_df,
-            bandgap_df=bandgap_df, cdft_taskid=cdft_taskid, cdft_url=cdft_url
+            bandgap_df=bandgap_df
         )
     )
 
-@app.route("/<string:collection_name>/doc_zfs/<string:uid>")
-@requires_auth
-def get_doc_zfs(collection_name, uid):
-    """
-    Returns document.
-    """
-    settings = CSETTINGS[collection_name]
-    criteria = {settings["unique_key"]: process(uid, settings["unique_key_type"])}
-    doc = DB[collection_name].find_one(criteria)
-    D = round(doc["pyzfs_out"]["D"]/1000, 2)
-    E = round(doc["pyzfs_out"]["E"]/1000, 2)
-    Dx = round(doc["pyzfs_out"]["Dx"]/1000, 2)
-    Dy = round(doc["pyzfs_out"]["Dy"]/1000, 2)
-    Dz = round(doc["pyzfs_out"]["Dz"]/1000, 2)
-    zfs_data = {"D": D, "E": E, "Dx": Dx, "Dy": Dy, "Dz": Dz}
-    return make_response(
-        render_template(
-            "doc_zfs.html", collection_name=collection_name, doc_id=uid, app_title=APP_TITLE, doc=doc,
-            zfs_data=zfs_data
-        )
-    )
 
 @app.route("/<string:collection_name>/doc_ir/<string:uid>")
 @requires_auth
@@ -577,7 +513,7 @@ def get_doc_ir(collection_name, uid):
 
     down_pg_name = ir["down"]["point_group"]
     down_character_table = ir["down"]["pg_character_table"]
-    down_character_table[0] = "r1 r1 " + down_character_table[0]
+    down_character_table[0] = "IR1 IR2 " + down_character_table[0]
     down_character_table = pd.DataFrame([x.split() for x in down_character_table])
     # set first row as header
     down_character_table.columns = down_character_table.iloc[0]
@@ -610,35 +546,15 @@ def get_doc_ir(collection_name, uid):
         down_pg_name, "down_character_table": Markup(down_character_table.to_html(index=False)),
                "up_ir": Markup(up_ir.to_html(index=False)), "down_ir": Markup(down_ir.to_html(index=False))}
 
+    filter = {"pc_from_id": doc["pc_from_id"], "defect_name": doc["defect_name"], "task_label": "SCAN_scf"}
+    scf_entry = DB["calc_data"].find_one(filter)
     return make_response(
         render_template(
-            "doc_ir.html", collection_name=collection_name, doc_id=uid, app_title=APP_TITLE, doc=doc, ir_data=ir_data
+            "doc_ir.html", collection_name=collection_name, doc_id=uid, app_title=APP_TITLE, doc=doc,
+            ir_data=ir_data, scf_taskid=scf_entry["task_id"]
         )
     )
 
-@app.route("/<string:collection_name>/doc_cdft/<string:uid>")
-@requires_auth
-def get_doc_cdft(collection_name, uid):
-    """
-    Returns document.
-    """
-    settings = CSETTINGS[collection_name]
-    criteria = {settings["unique_key"]: process(uid, settings["unique_key_type"])}
-    doc = DB[collection_name].find_one(criteria)
-
-    with cd(os.path.join(__file__, "static", "materials")):
-        basic_info_df = pd.read_json(f"{doc['taskid']}_basic_info_df.json")
-        cdft_df = pd.read_json(f"{doc['task_id']}_zpl_df.json")
-        up_df = pd.read_json(f"{doc['task_id']}_up_tdm_df.json")
-        down_df = pd.read_json(f"{doc['task_id']}_dn_tdm_df.json")
-
-    return make_response(
-        render_template(
-            "doc_cdft.html", collection_name=collection_name, doc_id=uid, app_title=APP_TITLE, doc=doc,
-            cdft=Markup(cdft_df.to_html(index=False)), up=Markup(up_df.to_html(index=False)), down=Markup(
-                down_df.to_html(index=False)), basic_info=Markup(basic_info_df.to_html(index=False))
-        )
-    )
 @app.route("/<string:collection_name>/doc/<string:uid>/<string:field>")
 @requires_auth
 def get_doc_field(collection_name, uid, field):
@@ -650,16 +566,6 @@ def get_doc_field(collection_name, uid, field):
     doc = DB[collection_name].find_one(criteria, projection=[field])
     return Response(str(doc[field]), mimetype="text/plain")
 
-@app.route("/<string:collection_name>/doc_zfs/<string:uid>/<string:field>")
-@requires_auth
-def get_doc_field_zfs(collection_name, uid, field):
-    """
-    Get doc field.
-    """
-    settings = CSETTINGS[collection_name]
-    criteria = {settings["unique_key"]: process(uid, settings["unique_key_type"])}
-    doc = DB[collection_name].find_one(criteria, projection=[field])
-    return Response(str(doc[field]), mimetype="text/plain")
 
 @app.route("/<string:collection_name>/doc_ir/<string:uid>/<string:field>")
 @requires_auth
@@ -685,35 +591,9 @@ def get_doc_json(collection_name, uid):
 
     return jsonify(jsanitize(doc))
 
-@app.route("/<string:collection_name>/doc_zfs/<string:uid>/json")
-@requires_auth
-def get_doc_json_zfs(collection_name, uid):
-    """
-    Get doc json.
-    """
-    settings = CSETTINGS[collection_name]
-    projection = {k: False for k in settings.get("doc_exclude", [])}
-    criteria = {settings["unique_key"]: process(uid, settings["unique_key_type"])}
-    doc = DB[collection_name].find_one(criteria, projection=projection)
-
-    return jsonify(jsanitize(doc))
-
 @app.route("/<string:collection_name>/doc_ir/<string:uid>/json")
 @requires_auth
 def get_doc_json_ir(collection_name, uid):
-    """
-    Get doc json.
-    """
-    settings = CSETTINGS[collection_name]
-    projection = {k: False for k in settings.get("doc_exclude", [])}
-    criteria = {settings["unique_key"]: process(uid, settings["unique_key_type"])}
-    doc = DB[collection_name].find_one(criteria, projection=projection)
-
-    return jsonify(jsanitize(doc))
-
-@app.route("/<string:collection_name>/doc_cdft/<string:uid>/json")
-@requires_auth
-def get_doc_json_cdft(collection_name, uid):
     """
     Get doc json.
     """

@@ -387,11 +387,11 @@ def get_doc(collection_name, uid):
                 return None
 
             calc_db = {
-                "db_name": "Scan2dDefect", "collection_name": "calc_data", "port": 27017,
+                "db_name": "Scan2dDefect", "collection_name": "calc_data", "port": 12349,
                 "user": "Jeng_ro"
             }
             ir_db = {
-                "db_name": "Scan2dDefect", "collection_name": "ir_data", "port": 27017,
+                "db_name": "Scan2dDefect", "collection_name": "ir_data", "port": 12349,
                 "user": "Jeng_ro"
             }
             run_defect_state = RunDefectState(

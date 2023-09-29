@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block title %}{{app_title}}{% endblock %}
+
+{% block top_javascript %}
+{#<script src="{{ url_for('static', filename='js/renderjson.js') }}"></script>#}
+<script src="/static/js/renderjson.js"></script>
+<script src="/static/js/3Dmol-nojquery-min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+    $.get("/{{ collection_name }}/doc_ir/{{doc_id}}/json", function( data ) {
+      document.getElementById("doc").appendChild(
+        renderjson.set_show_by_default(false)
+                  .set_show_to_level(0)
+                  .set_sort_objects(false)
+                  .set_icons('+', '-')
+                  .set_max_string_length(20)(data));
+    });
+
+  });
+</script>
+
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css" />
+    <link rel="shortcut icon" href="/static/images/favicon.png"/>
+    <link rel=stylesheet type=text/css
+          href="/static/style.css">
+
+<link rel=stylesheet type=text/css
+          href="{{ url_for('static', filename='index.css') }}">
+    <style>
+      .renderjson a { text-decoration: none; }
+      .renderjson .disclosure { color: crimson;
+                                font-size: 150%; }
+      .renderjson .syntax { color: grey; }
+      .renderjson .string { color: darkred; }
+      .renderjson .number { color: darkcyan; }
+      .renderjson .boolean { color: blueviolet; }
+      .renderjson .key    { color: darkblue; }
+      .renderjson .keyword { color: blue; }
+      .renderjson .object.syntax { color: lightseagreen; }
+      .renderjson .array.syntax  { color: orange; }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+<h2>Collection: {{collection_name}}, Task_id: {{doc_id}}</h2>
+
+<div style="float: left">
+<h4>Information</h4>
+<div>SCF-task_id: {{ doc.prev_fw_taskid }}</div><br/>
+<div> Post_relax_sg_name: {{ ir_data.post_relax_sg_name }}</div><br/>
+<div> Post_relax_sg_num: {{ ir_data.post_relax_sg_number }}</div><br/>
+
+<h4>Spin-up channel</h4>
+<div> Point_group: {{ ir_data.up_pg_name }}</div><br/>
+<div> Character table: <br/>
+    <p>{{ ir_data.up_character_table }}</p>
+</div><br/>
+<div>Irreps:</div><br/>
+<div>index | band_index | eigenval | irrep | degeneracy</div>
+    {{ ir_data.up_ir }}
+
+<h4>Spin-down channel</h4>
+<div> Point_group: {{ ir_data.down_pg_name }}</div><br/>
+<div> Character table: <br/>
+    <p>{{ ir_data.down_character_table }}</p>
+</div><br/>
+<div>Irreps:</div><br/>
+<div>index | band_index | eigenval | irrep | degeneracy</div>
+    {{ ir_data.down_ir }}
+
+
+<h4>Full document</h4>
+<div>Rendered JSON (click +/- to expand/collapse):</div>
+<div id="doc">
+
+</div>
+
+
+<br/><br/><br/>
+
+</div>
+
+
+<div style="float: left; margin-left: 100px">
+<h4>Defect levels</h4>
+<img style="width:800px; height:720px" src="/static/materials/{{ scf_taskid }}.png"><br>
+<h4>IPR</h4>
+
+<img style="width:800px; height:400px" src="/static/materials/{{ scf_taskid }}_ipr.png">
+
+</div>
+
+
+{#    <div style="float: right; margin-left: 50px">#}
+{#        <h4>Irreps - spin down</h4>#}
+{#                <div>index | band_index | eigenval | irrep | degeneracy</div>#}
+{#            {{ ir_data.down_ir }}#}
+{#    </div>#}
+
+{% endblock %}

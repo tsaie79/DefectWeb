@@ -36,9 +36,9 @@ def get_ir_data():
 def get_ev(task_id):
     from qubitPack.qc_searching.analysis.main import RunDefectState
     from qubitPack.tool_box import get_db
-    calc_db = {"db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "calc_data-pbe_pc", "port": 27017,
+    calc_db = {"db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "calc_data-pbe_pc", "port": 12349,
           "user": "Jeng_ro"}
-    ir_db = {"db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "ir_data-pbe_pc", "port": 27017,
+    ir_db = {"db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "ir_data-pbe_pc", "port": 12349,
              "user": "Jeng_ro"}
     run_defect_state = RunDefectState(
         calc_db_config={"db_name": calc_db["db_name"], "collection_name": calc_db[

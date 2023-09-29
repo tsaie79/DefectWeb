@@ -9,9 +9,9 @@ import os
 import time, concurrent.futures
 
 flamyngo_path = "/home/tsai/site-packages/HT_defect_web/flamyngo"
-HSEDB = get_db("HSE_triplets_from_Scan2dDefect", "calc_data-pbe_pc", user="Jeng", password="qimin", port=27017)
-HSECDFT= get_db("HSE_triplets_from_Scan2dDefect", "cdft-pbe_pc", user="Jeng", password="qimin", port=27017)
-HSEZFS =get_db("HSE_triplets_from_Scan2dDefect", "zfs_data-pbe_pc", user="Jeng", password="qimin", port=27017)
+HSEDB = get_db("HSE_triplets_from_Scan2dDefect", "calc_data-pbe_pc", user="Jeng", password="qimin", port=12349)
+HSECDFT= get_db("HSE_triplets_from_Scan2dDefect", "cdft-pbe_pc", user="Jeng", password="qimin", port=12349)
+HSEZFS =get_db("HSE_triplets_from_Scan2dDefect", "zfs_data-pbe_pc", user="Jeng", password="qimin", port=12349)
 
 def generate_all_figures(threshold_tot_proj, taskid, edge_tol=None, select_bands=None):
 
@@ -36,11 +36,11 @@ def generate_all_figures(threshold_tot_proj, taskid, edge_tol=None, select_bands
 
         def get_ev_ipr():
             calc_db = {
-                "db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "calc_data-pbe_pc", "port": 27017,
+                "db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "calc_data-pbe_pc", "port": 12349,
                 "user": "Jeng_ro"
             }
             ir_db = {
-                "db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "ir_data-pbe_pc", "port": 27017,
+                "db_name": "HSE_triplets_from_Scan2dDefect", "collection_name": "ir_data-pbe_pc", "port": 12349,
                 "user": "Jeng_ro"
             }
             run_defect_state = RunDefectState(calc_db_config=calc_db, ir_db_config=ir_db)

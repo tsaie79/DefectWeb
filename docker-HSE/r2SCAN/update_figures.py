@@ -9,7 +9,7 @@ import os
 import time, concurrent.futures
 
 flamyngo_path = "/home/tsai/site-packages/flamyngo_Scan2dDefect/flamyngo/"
-SCAN2dDefect = get_db("Scan2dDefect", "calc_data", user="Jeng", password="qimin", port=27017)
+SCAN2dDefect = get_db("Scan2dDefect", "calc_data", user="Jeng", password="qimin", port=12349)
 
 wrong_bandedges_taskids = [4, 57, 67, 84, 89, 160, 162, 165, 178, 205, 220, 291, 319, 361, 366, 375, 391, 412,
                            425, 437, 441, 494, 501, 528, 645, 659, 667, 673, 682, 687, 696, 720, 745, 866, 888,
@@ -55,11 +55,11 @@ def generate_all_figures():
 
         def get_ev_ipr():
             calc_db = {
-                "db_name": "Scan2dDefect", "collection_name": "calc_data", "port": 27017,
+                "db_name": "Scan2dDefect", "collection_name": "calc_data", "port": 12349,
                 "user": "Jeng_ro"
             }
             ir_db = {
-                "db_name": "Scan2dDefect", "collection_name": "ir_data", "port": 27017,
+                "db_name": "Scan2dDefect", "collection_name": "ir_data", "port": 12349,
                 "user": "Jeng_ro"
             }
             run_defect_state = RunDefectState(

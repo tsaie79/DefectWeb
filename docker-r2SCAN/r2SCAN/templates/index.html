@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+
+{% block title %}{{app_title}}{% endblock %}
+
+{% block top_javascript %}
+
+<script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/buttons/1.2.1/js/dataTables.buttons.min.js"></script>
+<script src="//cdn.datatables.net/buttons/1.2.1/js/buttons.flash.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+<script src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+<script src="//cdn.datatables.net/buttons/1.2.1/js/buttons.html5.min.js"></script>
+<script src="//cdn.datatables.net/buttons/1.2.1/js/buttons.print.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-autocomplete/1.0.7/jquery.auto-complete.min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+    $('input[type=submit]').button();
+    $("#select-collection" ).selectmenu();
+    $("#query-input").autocomplete({
+        source:function(request, response) {
+            $.getJSON("{{url_for('autocomplete')}}",{
+                term: request.term, 
+                collection : $("#select-collection").val(),
+            }, function(data) {
+                response(data.matching_results); // matching_results from jsonify
+            });
+        },
+        minLength: 1,
+    });
+    $('#results-table').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        "order": [[ {{sort_index}}, "{{sort_mode}}" ]]
+    } );
+  });
+</script>
+{% endblock %}
+
+{%  block css %}
+<link rel=stylesheet type=text/css
+          href="{{ url_for('static', filename='index.css') }}">
+<link rel=stylesheet type=text/css
+          href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+<link rel=stylesheet type=text/css
+          href="https://cdn.datatables.net/buttons/1.2.1/css/buttons.dataTables.min.css">
+<link rel=stylesheet type=test/css
+          href="https://cdnjs.cloudflare.com/ajax/libs/jquery-autocomplete/1.0.7/jquery.auto-complete.min.css">
+
+
+{% endblock %}
+
+
+{% block content %}
+
+<form action="/query" method="get" name="query">
+<p>
+<select name="collection" id="select-collection">
+    {% for c in collections %}
+    {% if c == active_collection %}
+        <option value="{{c}}" selected="selected">{{c}}</option>
+    {% else %}
+        <option value="{{c}}">{{c}}</option>
+    {% endif %}
+    {% endfor %}
+</select>
+</p>
+<p id="query">
+<input type="text" name="search_string" id="query-input"
+               placeholder="Type query..." size="50"
+       value="{{search_string}}"></p>
+{#<p id="helptext">{{ helptext | safe }}</p>#}
+<p id="helptext">Query examples: 'task_id', 'S-W', mongo-like dict query</p>
+<p>
+<input type="submit" name="submit" value="Search">
+</p>
+</form>
+
+<p>Click below to list all "vacancy" or "antisite" defects</p>
+<p>
+<button class="ui-button ui-widget ui-state-default ui-corner-all ui-state-hover"  style="color: #555555; padding:
+6px; border: 1px solid #d3d3d3;" id="vacancy">Vacancy</button>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<button class="ui-button ui-widget ui-state-default ui-corner-all ui-state-hover"  style="color: #555555; padding:
+6px; border: 1px solid #d3d3d3;" id="antisite">Antisite</button>
+</p>
+
+{% if results %}
+
+<h1>Results</h1>
+
+{% if collection_name == "calc_data" %}
+    {% set doc_name = "doc" %}
+{% elif collection_name == "ir_data" %}
+    {% set doc_name = "doc_ir" %}
+{% endif %}
+
+<table id="results-table" class="display">
+    <thead>
+    <tr>
+        {% for f in fields %}
+        <th>{{f}}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for r in results %}
+    <tr>
+        {% for f in fields %}
+            {% if f == mapped_names[unique_key] %}
+                <td class="centered">
+                    <a target="_blank" href="/{{collection_name}}/{{ doc_name }}/{{r[loop.index0]}}">{{r[loop
+                    .index0]|safe}}</a>
+                </td>
+            {% else %}
+                <td class="centered">{{r[loop.index0]|safe}}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
+
+{% if error_message %}
+<h2>{{ error_message }}</h2>
+{% endif %}
+
+
+{% endblock %}
