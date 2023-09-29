@@ -8,7 +8,7 @@ from qubitPack.qc_searching.analysis.main import RunDefectState
 import os
 import time, concurrent.futures
 
-flamyngo_path = "/home/tsai/site-packages/flamyngo_Scan2dDefect/flamyngo/"
+flamyngo_path = os.path.abspath(os.path.dirname(__file__))
 SCAN2dDefect = get_db("Scan2dDefect", "calc_data", user="Jeng", password="qimin", port=12349)
 
 wrong_bandedges_taskids = [4, 57, 67, 84, 89, 160, 162, 165, 178, 205, 220, 291, 319, 361, 366, 375, 391, 412,

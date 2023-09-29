@@ -8,7 +8,7 @@ from qubitPack.qc_searching.analysis.main import RunDefectState
 import os
 import time, concurrent.futures
 
-flamyngo_path = "/home/tsai/site-packages/HT_defect_web/flamyngo"
+flamyngo_path = os.path.abspath(os.path.dirname(__file__))
 HSEDB = get_db("HSE_triplets_from_Scan2dDefect", "calc_data-pbe_pc", user="Jeng", password="qimin", port=12349)
 HSECDFT= get_db("HSE_triplets_from_Scan2dDefect", "cdft-pbe_pc", user="Jeng", password="qimin", port=12349)
 HSEZFS =get_db("HSE_triplets_from_Scan2dDefect", "zfs_data-pbe_pc", user="Jeng", password="qimin", port=12349)
@@ -166,7 +166,7 @@ def update_defect_level_plots_in_db(threshold_tot_proj, taskid):
         print(f"Finished in {t2-t1} seconds")
 
 def update_cdft_entries_in_db_and_generate_json():
-    from JPack_independent.projects.defectDB.analysis.data_analysis import CDFT
+    from JPack.projects.defectDB.analysis.data_analysis import CDFT
     for doc in list(HSECDFT.collection.find({"task_label": "CDFT-B-HSE_scf"})):
         print("------------------"*5, doc["task_id"])
         owls = [2657, 2658, 2671, 2688, 2707, 2708]

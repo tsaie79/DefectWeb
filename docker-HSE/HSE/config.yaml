@@ -12,7 +12,7 @@ help: "Supported queries: task_id (int)"
 # changes. It is imperative you do not change the variable names in the Jinja
 # templates or Flamyngo will not work.
 
-template_folder: /Volumes/JengStorage/Research/Project/HT_defect_Web/HSE/templates
+template_folder: /usr/local/lib/python3.7/site-packages/flamyngo/templates
 
 # MongoDB settings
 db:
@@ -62,7 +62,7 @@ collections:
       - [ charge_state, int ]
       - [ data_web.bandgap_df.bandgap.0, "%.3f" ]
       - [ data_web.zfs_data.D, "%.2f" ]
-      - [ data_web.cdft_data.zpl_df.0.ZPL, "%.3f" ]
+      - [ data_web._data.zpl_df.0.ZPL, "%.3f" ]
       - [ data_web.cdft_data.zpl_df.0.transition_from, str ]
       - [ data_web.cdft_data.zpl_df.1.ZPL, "%.3f" ]
       - [ data_web.cdft_data.zpl_df.1.transition_from, str ]
