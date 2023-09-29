@@ -116,9 +116,10 @@ def generate_all_figures(threshold_tot_proj, taskid, edge_tol=None, select_bands
         get_structure_info()
         get_ev_ipr()
 
-    entries = list(HSEDB.collection.find({"task_label": "HSE_scf", "task_id": taskid}))
-    #"data_web.bandgap_df.bandgap.0": {
-    # "$exists": 0}}))]
+    if taskid is None:
+        entries = list(HSEDB.collection.find({"task_label": "HSE_scf"}))
+    else:
+        entries = list(HSEDB.collection.find({"task_label": "HSE_scf", "task_id": taskid}))
     t1 = time.perf_counter()
     for entry in entries:
         # with cd(os.path.join(flamyngo_path, "static", "materials")):
@@ -165,9 +166,14 @@ def update_defect_level_plots_in_db(threshold_tot_proj, taskid):
         t2 = time.perf_counter()
         print(f"Finished in {t2-t1} seconds")
 
-def update_cdft_entries_in_db_and_generate_json():
+def update_cdft_entries_in_db_and_generate_json(taskid=None, update_db=False):
     from JPack.projects.defectDB.analysis.data_analysis import CDFT
-    for doc in list(HSECDFT.collection.find({"task_label": "CDFT-B-HSE_scf"})):
+    if taskid is None:
+        db_filter = {"task_label": "CDFT-B-HSE_scf"}
+    else:
+        db_filter = {"task_label": "CDFT-B-HSE_scf", "prev_fw_taskid": taskid}
+
+    for doc in list(HSECDFT.collection.find(db_filter)):
         print("------------------"*5, doc["task_id"])
         owls = [2657, 2658, 2671, 2688, 2707, 2708]
         if doc["taskid"] in owls:
@@ -191,8 +197,10 @@ def update_cdft_entries_in_db_and_generate_json():
         cdft_dict = {}
         for d_name, d in zip(["zpl_df", "tdm_up_df", "tdm_dn_df"], [cdft_df, up_df, down_df]):
             cdft_dict[d_name] = d.to_dict(orient="records")
-        HSECDFT.collection.update_one({"task_id": doc["task_id"]}, {"$set": {"data_web": cdft_dict}})
-        HSEDB.collection.update_one({"task_id": doc["taskid"]}, {"$set": {"data_web.cdft_data": cdft_dict}})
+        if update_db:
+            HSECDFT.collection.update_one({"task_id": doc["task_id"]}, {"$set": {"data_web": cdft_dict}})
+            HSEDB.collection.update_one({"task_id": doc["taskid"]}, {"$set": {"data_web.cdft_data": cdft_dict}})
+
         with cd(os.path.join(flamyngo_path, "static", "materials")):
             basic_info_df.to_json(f"{doc['taskid']}_basic_info_df.json")
             cdft_df.to_json(f"{doc['task_id']}_zpl_df.json")
@@ -243,9 +251,30 @@ def update_zfs_in_db():
 
 
 if __name__ == "__main__":
-    # loc, taskid = 0.14, 2569
+    # loc, taskid = 0.2, 60
     # generate_all_figures(loc, taskid)
-    # update_defect_level_plots_in_db(loc, taskid)
-    update_singlet_triplet_diff_in_db()
-    # update_cdft_entries_in_db_and_generate_json()
-    # update_zfs_in_db()
+    # # update_defect_level_plots_in_db(loc, taskid)
+    # # update_singlet_triplet_diff_in_db()
+    # update_cdft_entries_in_db_and_generate_json(taskid=taskid)
+    # # update_zfs_in_db()
+
+    # add the arg for python script
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--taskid", help="taskid", type=int, default=None)
+    parser.add_argument("--threshold", help="threshold", type=float, default=0.2)
+    parser.add_argument("--generate_figures", help="generate figures", action="store_true", default=False)
+    parser.add_argument("--generate_cdft_json", help="generate cdft json", action="store_true", default=False)
+    parser.add_argument("--update_cdft_in_db", help="update cdft in db", action="store_true", default=False)
+
+    taskid = parser.parse_args().taskid
+    if parser.parse_args().generate_figures:
+        threshold = parser.parse_args().threshold
+        generate_all_figures(threshold, taskid)
+
+    if parser.parse_args().generate_cdft_json:
+        update_cdft_entries_in_db_and_generate_json(taskid=taskid, update_db=parser.parse_args().update_cdft_in_db)
+
+
+# how to run the script
+# python update_figures.py --taskid 60 --threshold 0.14 --generate_figures --generate_cdft_json

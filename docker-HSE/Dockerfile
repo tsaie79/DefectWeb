@@ -42,7 +42,8 @@ RUN pip install monty==3.0.2
 RUN pip install ipython
 
 RUN git clone https://github.com/tsaie79/JPack.git /usr/local/lib/python3.7/site-packages/JPack
-RUN pip install sklearn
+RUN git clone https://github.com/tsaie79/VaspBandUnfolding.git /usr/local/lib/python3.7/site-packages/VaspBandUnfolding
+RUN pip install scikit-learn
 
 
 # cp r2SCAN to site-packages and rename it to flamyngo
