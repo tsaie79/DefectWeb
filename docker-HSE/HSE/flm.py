@@ -81,8 +81,8 @@ def main():
         dest="port",
         type=int,
         nargs="?",
-        default=5000,
-        help="Port in which to run the server. Defaults to 5000.",
+        default=5001,
+        help="Port in which to run the server. Defaults to 5001.",
     )
 
     args = parser.parse_args()
