@@ -13,6 +13,16 @@ HSEDB = get_db("HSE_triplets_from_Scan2dDefect", "calc_data-pbe_pc", user="Jeng"
 HSECDFT= get_db("HSE_triplets_from_Scan2dDefect", "cdft-pbe_pc", user="Jeng", password="qimin", port=12349)
 HSEZFS =get_db("HSE_triplets_from_Scan2dDefect", "zfs_data-pbe_pc", user="Jeng", password="qimin", port=12349)
 
+
+def check_if_done(entry, ref_file):
+    with cd(os.path.join(flamyngo_path, "static", "materials")):
+        if len(glob.glob(f"{entry['task_id']}_{ref_file}")) != 0:
+            print(f"%%%%%%% {entry['task_id']} done" * 5)   
+            return True
+        else:
+            return False
+            
+
 def generate_all_figures(threshold_tot_proj, taskid, edge_tol=None, select_bands=None):
 
     def get_doc(doc):
@@ -120,12 +130,10 @@ def generate_all_figures(threshold_tot_proj, taskid, edge_tol=None, select_bands
         entries = list(HSEDB.collection.find({"task_label": "HSE_scf"}))
     else:
         entries = list(HSEDB.collection.find({"task_label": "HSE_scf", "task_id": taskid}))
+    entries = [entry for entry in entries if not check_if_done(entry, "ipr.png")]
+
     t1 = time.perf_counter()
     for entry in entries:
-        with cd(os.path.join(flamyngo_path, "static", "materials")):
-            if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
-                print("%%%%%%% done"*5)
-                continue
         try:
             get_doc(entry)
         except Exception as e:
@@ -174,13 +182,7 @@ def update_cdft_entries_in_db_and_generate_json(taskid=None, update_db=False):
         db_filter = {"task_label": "CDFT-B-HSE_scf", "prev_fw_taskid": taskid}
 
     entries = list(HSEDB.collection.find(db_filter))
-    def check_if_done(entry):
-        with cd(os.path.join(flamyngo_path, "static", "materials")):
-            if len(glob.glob(f"{entry['task_id']}_basic_info_df.json")) != 0:
-                return True
-            else:
-                return False
-    entries = [entry for entry in entries if not check_if_done(entry)]
+    entries = [entry for entry in entries if not check_if_done(entry, "basic_info_df.json")]
 
     for doc in entries:
         print("------------------"*5, doc["task_id"])

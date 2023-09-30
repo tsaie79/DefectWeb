@@ -16,6 +16,15 @@ from concurrent.futures import ProcessPoolExecutor
 # get the path of the python file
 __file__ = os.path.abspath(os.path.dirname(__file__))
 
+
+def check_if_done(entry, ref_file):
+    with cd(os.path.join(__file__, "static", "materials")):
+        if len(glob.glob(f"{entry['task_id']}_{ref_file}")) != 0:
+            print(f"%%%%%%% {entry['task_id']} done" * 5)   
+            return True
+        else:
+            return False
+
 import re
 def regex_match(regex, string):
     return re.search(regex, string).group(0)
@@ -183,17 +192,7 @@ def generate_all_figures(taskid):
         entries = list(SCAN2dDefect.collection.find({"task_id": taskid}))
     else:
         entries = list(SCAN2dDefect.collection.find({"task_label": "SCAN_scf"}))
-
-    def check_if_done(entry):
-        with cd(os.path.join(__file__, "static", "materials")):
-            if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
-                print("%%%%%%% done"*5)
-                return True
-            else:
-                return False
-    
-    entries = [entry for entry in entries if not check_if_done(entry)]
-    print("-------------------")
+    entries = [entry for entry in entries if not check_if_done(entry, "ipr.png")]
 
     t1 = time.perf_counter()
     with ProcessPoolExecutor() as executor:

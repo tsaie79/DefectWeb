@@ -32,6 +32,15 @@ wrong_bandedges_taskids = [4, 57, 67, 84, 89, 160, 162, 165, 178, 205, 220, 291,
                            5970, 5978, 5982, 6012, 6013, 6027, 6033, 6040, 6051, 6071, 6072, 6073, 6084]
 
 
+def check_if_done(entry, ref_file):
+    with cd(os.path.join(__file__, "static", "materials")):
+        if len(glob.glob(f"{entry['task_id']}_{ref_file}")) != 0:
+            print(f"%%%%%%% {entry['task_id']} done" * 5)   
+            return True
+        else:
+            return False
+
+
 def generate_all_figures(threshold_tot_proj=0.03, taskid=wrong_bandedges_taskids):
 
     def get_doc(doc):
@@ -154,11 +163,9 @@ def generate_all_figures(threshold_tot_proj=0.03, taskid=wrong_bandedges_taskids
         entries = list(SCAN2dDefect.collection.find({"task_label": "SCAN_scf",
                                                     "data_web.bandgap_df.bandgap.0": {"$exists": 0}}))
     t1 = time.perf_counter()
+
+    entries = [entry for entry in entries if not check_if_done(entry, "ipr.png")]
     for entry in entries:
-        with cd(os.path.join(flamyngo_path, "static", "materials")):
-            if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
-                print("%%%%%%% done"*5)
-                continue
         try:
             get_doc(entry)
         except Exception as e:
