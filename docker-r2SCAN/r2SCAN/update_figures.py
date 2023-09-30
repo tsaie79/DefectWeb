@@ -32,7 +32,7 @@ wrong_bandedges_taskids = [4, 57, 67, 84, 89, 160, 162, 165, 178, 205, 220, 291,
                            5970, 5978, 5982, 6012, 6013, 6027, 6033, 6040, 6051, 6071, 6072, 6073, 6084]
 
 
-def generate_all_figures():
+def generate_all_figures(threshold_tot_proj=0.03, taskid=wrong_bandedges_taskids):
 
     def get_doc(doc):
         """
@@ -81,7 +81,7 @@ def generate_all_figures():
                 eigen_plot, fig, _, _, bulk_df, d_df, defect_levels, tot, perturbed_bandedge_df = \
                     run_defect_state.plot_ipr_vs_tot_proj(
                         taskid=int(uid),
-                        threshold=0.03,
+                        threshold=threshold_tot_proj,
                         defect_plot=None,  # "eigen",
                         threshold_from="tot_proj",
                         edge_tol=(0.25, 0.25)
@@ -148,8 +148,11 @@ def generate_all_figures():
         get_structure_info()
         get_ev_ipr()
 
-    entries = list(SCAN2dDefect.collection.find({"task_label": "SCAN_scf",
-                                                 "data_web.bandgap_df.bandgap.0": {"$exists": 0}}))
+    if taskid is not None:
+        entries = list(SCAN2dDefect.collection.find({"task_id": taskid}))
+    else:
+        entries = list(SCAN2dDefect.collection.find({"task_label": "SCAN_scf",
+                                                    "data_web.bandgap_df.bandgap.0": {"$exists": 0}}))
     t1 = time.perf_counter()
     for entry in entries:
         # with cd(os.path.join(path, "static", "materials")):
@@ -197,5 +200,22 @@ def update_entries_in_db():
         print(f"Finished in {t2-t1} seconds")
 
 if __name__ == "__main__":
-    generate_all_figures()
-    update_entries_in_db()
+    # generate_all_figures()
+    # update_entries_in_db()
+
+    import argparse
+    parse = argparse.ArgumentParser()
+    parse.add_argument("--taskid", type=int, default=None)
+    parse.add_argument("--threshold_tot_proj", type=float, default=0.03)
+    parse.add_argument("--update_db", type=bool, default=False)
+    args = parse.parse_args()
+    taskid = args.taskid
+    threshold_tot_proj = args.threshold_tot_proj
+    generate_all_figures(threshold_tot_proj=threshold_tot_proj, taskid=taskid)
+    if args.update_db:
+        update_entries_in_db()
+        
+
+
+
+

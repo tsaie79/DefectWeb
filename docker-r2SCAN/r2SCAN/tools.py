@@ -176,19 +176,28 @@ def get_doc(doc):
     get_ev_ipr()
 
 
-def generate_all_figures():
+def generate_all_figures(taskid):
     # path = "/home/tsai/site-packages/flamyngo_Scan2dDefect/flamyngo/"
     SCAN2dDefect = get_db("Scan2dDefect", "calc_data", user="Jeng_ro", password="qimin", port=12349)
-    entries = list(SCAN2dDefect.collection.find({"task_label": "SCAN_scf", }))
+    if taskid is not None:
+        entries = list(SCAN2dDefect.collection.find({"task_id": taskid}))
+    else:
+        entries = list(SCAN2dDefect.collection.find({"task_label": "SCAN_scf"}))
     print("-------------------")
 
     t1 = time.perf_counter()
     with ProcessPoolExecutor() as executor:
-        results = executor.map(get_doc, entries[:5])
+        results = executor.map(get_doc, entries)
     # get_doc(entries[0])
     t2 = time.perf_counter()
     print("time: ", t2 - t1)
 
 
 if __name__ == "__main__":
-    generate_all_figures()
+    import argparse
+    parse = argparse.ArgumentParser()
+    parse.add_argument("--taskid", type=int, default=None)
+    args = parse.parse_args()
+    taskid = args.taskid
+    generate_all_figures(taskid)
+
