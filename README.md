@@ -48,5 +48,6 @@ To run the website, run the following command in the container shell:
 nohup sh run-web.sh > nohup.out 2>&1 &
 ```
 - Notice that one has to at the `/usr/local/lib/python3.7/site-packages/flamyngo/ ` folder to run the website.
+- One can leave the container shell after running the website.
 - The configuration file `config.yaml` is used to configure the website. Please check the [Flamyngo](https://github.com/materialsvirtuallab/flamyngo) for more details.
-- The website will be running at `http://localhost:5000/` for r2SCAN and `http://localhost:5001/` for HSE. To change the port, please check the `config.yaml` file.
+- The website will be running at `http://localhost:5000/` for r2SCAN and `http://localhost:5001/` for HSE. To change the port, please check the script `run-web.sh` for more details.
