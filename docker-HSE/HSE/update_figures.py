@@ -122,10 +122,10 @@ def generate_all_figures(threshold_tot_proj, taskid, edge_tol=None, select_bands
         entries = list(HSEDB.collection.find({"task_label": "HSE_scf", "task_id": taskid}))
     t1 = time.perf_counter()
     for entry in entries:
-        # with cd(os.path.join(flamyngo_path, "static", "materials")):
-        #     if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
-        #         print("%%%%%%% done"*5)
-        #         continue
+        with cd(os.path.join(flamyngo_path, "static", "materials")):
+            if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
+                print("%%%%%%% done"*5)
+                continue
         try:
             get_doc(entry)
         except Exception as e:

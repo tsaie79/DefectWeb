@@ -183,6 +183,16 @@ def generate_all_figures(taskid):
         entries = list(SCAN2dDefect.collection.find({"task_id": taskid}))
     else:
         entries = list(SCAN2dDefect.collection.find({"task_label": "SCAN_scf"}))
+
+    def check_if_done(entry):
+        with cd(os.path.join(__file__, "static", "materials")):
+            if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
+                print("%%%%%%% done"*5)
+                return True
+            else:
+                return False
+    
+    entries = [entry for entry in entries if not check_if_done(entry)]
     print("-------------------")
 
     t1 = time.perf_counter()

@@ -155,10 +155,10 @@ def generate_all_figures(threshold_tot_proj=0.03, taskid=wrong_bandedges_taskids
                                                     "data_web.bandgap_df.bandgap.0": {"$exists": 0}}))
     t1 = time.perf_counter()
     for entry in entries:
-        # with cd(os.path.join(path, "static", "materials")):
-        #     if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
-        #         print("%%%%%%% done"*5)
-        #         continue
+        with cd(os.path.join(flamyngo_path, "static", "materials")):
+            if  len(glob.glob(f"{entry['task_id']}_ipr.png")) != 0:
+                print("%%%%%%% done"*5)
+                continue
         try:
             get_doc(entry)
         except Exception as e:
