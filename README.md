@@ -12,11 +12,27 @@ sh build_docker.sh
 ```
 - Notice that it will genereate a set of SSH keys for building the SSH tunnel from the container to the database server. Please make sure that the SSH keys are properly generated and the public key is added to the authorized_keys on the database server.
 
+# Run the docker image
 To run the docker image, run the following command in the terminal:
 ```bash
 sh run_docker.sh
 ```
-- Notice that it will login to the container shell directly.
+- The environment variable `HOST` is used to set the IP address of the database server. Please check the script `run_docker.sh` for more details.
+- This will run the docker image in the interactive mode. The container shell will be opened in the background. To access the container shell, run the following command in the terminal:
+```bash
+docker exec -it CONTAINERID /bin/bash
+```
+- To check the container ID, run the following command in the terminal:
+```bash
+docker ps
+```
+
+# Build the SSH tunnel from the container to the database server
+It is required to build the SSH tunnel from the container to the database server, run the following command in the container shell:
+```bash
+sh /app/tunnel-db.sh
+``` 
+- IP address of the database server is required to build the SSH tunnel. It is set by the environment variable `HOST` in the script `run_docker.sh`. Please check the script `tunnel-db.sh` for more details.
 
 # Generate the files for the website
 To generate the files for the website, run the following command in the container shell:
@@ -29,7 +45,7 @@ sh /app/generate_rawdata.sh
 # Run the website
 To run the website, run the following command in the container shell:
 ```bash
-flm -c config.yaml
+nohup sh run-web.sh > nohup.out 2>&1 &
 ```
 - Notice that one has to at the `/usr/local/lib/python3.7/site-packages/flamyngo/ ` folder to run the website.
 - The configuration file `config.yaml` is used to configure the website. Please check the [Flamyngo](https://github.com/materialsvirtuallab/flamyngo) for more details.
