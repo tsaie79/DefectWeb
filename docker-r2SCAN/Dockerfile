@@ -52,6 +52,9 @@ RUN mv r2SCAN/* flamyngo/
 
 WORKDIR /usr/local/lib/python3.7/site-packages/flamyngo
 
+# bind the volume to the container
+VOLUME /usr/local/lib/python3.7/site-packages/flamyngo/static/materials
+
 EXPOSE 5000
 # CMD ["sh", "/tunnel-db.sh"]
 # ENTRYPOINT ["flm", "-d", "-c", "config.yaml"]
