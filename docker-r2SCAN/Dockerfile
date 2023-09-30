@@ -23,7 +23,8 @@ COPY tunnel-db.sh .
 RUN apt-get update && \
     apt-get install -y openssh-server && \
     apt-get install -y git && \ 
-    apt-get install -y gcc
+    apt-get install -y gcc && \
+    apt-get install -y vim
     
 RUN pip install --upgrade pip
 
