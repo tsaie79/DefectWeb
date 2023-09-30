@@ -10,7 +10,7 @@ To build the docker image, run the following command in the terminal:
 ```bash
 sh build-docker.sh
 ```
-- Notice that it will genereate a set of SSH keys for building the SSH tunnel from the container to the database server. Please make sure that the SSH keys are properly generated and the public key is added to the authorized_keys on the database server.
+- Notice that it will genereate a set of SSH keys for building the SSH tunnel from the container to the database server. Please make sure that the SSH keys are properly generated and the public key is added to the `authorized_keys` on the database server.
 
 # Run the docker image
 To run the docker image, run the following command in the terminal:
@@ -49,5 +49,4 @@ nohup sh run-web.sh > nohup.out 2>&1 &
 ```
 - Notice that one has to at the `/usr/local/lib/python3.7/site-packages/flamyngo/ ` folder to run the website.
 - The configuration file `config.yaml` is used to configure the website. Please check the [Flamyngo](https://github.com/materialsvirtuallab/flamyngo) for more details.
-- The website will be running at `http://localhost:5000/`. The port 5000 in the container is mapped to the port 5000 on the host machine. The url `http://localhost:5000/` can be accessed from the host machine.
-
+- The website will be running at `http://localhost:5000/` for r2SCAN and `http://localhost:5001/` for HSE. To change the port, please check the `config.yaml` file.

@@ -58,6 +58,6 @@ RUN mv HSE/* flamyngo/
 
 WORKDIR /usr/local/lib/python3.7/site-packages/flamyngo
 
-EXPOSE 5000
+EXPOSE 5001
 # RUN sh /tunnel-db.sh
 # ENTRYPOINT ["flm", "-d", "-c", "config.yaml"]
