@@ -1,5 +1,5 @@
 # Introduction
-This package is for building the websites demostrating the defect databases with the following DFT calculations:
+This package is for building the websites demonstrating the defect databases with the following DFT calculations:
 - Defect calculations with r2SCAN functional
 - Defect calculations with HSE functional
 
