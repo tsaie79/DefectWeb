@@ -18,6 +18,7 @@ To run the docker image, run the following command in the terminal:
 sh run-docker.sh
 ```
 - The environment variable `HOST` is used to set the IP address of the database server. Please check the script `run-docker.sh` for more details.
+- The environment variable `RAWDATA_MOUNT_POINT` is used to set the mount point of the raw data. Please check the script `run-docker.sh` for more details.
 - This will run the docker image in the interactive mode. The container shell will be opened in the background. To access the container shell, run the following command in the terminal:
 ```bash
 docker exec -it CONTAINERID /bin/bash
@@ -41,6 +42,7 @@ sh /app/generate-rawdata.sh
 ```
 - Notice that it will generate the files in the folder `/usr/local/lib/python3.7/site-packages/flamyngo/static/materials`. If the folder `materials` does not exist, please create it manually.
 - To generate the proper files for the website, check the python scripts used in the script `generate-rawdata.sh`. Flags are used to control the functions. For example, the flag `--generate_figures` is used to generate the figures for the website. If the flag is not used, the figures will not be generated. Please check the python scripts for more details.
+- Notice that raw data should not be generated again. The function `check_if_done` in python scripts is used to check if the raw data has been generated. Please check the python scripts in `generate-rawdata.sh` for more details.
 
 # Run the website
 To run the website, run the following command in the container shell:
@@ -51,3 +53,8 @@ nohup sh run-web.sh > nohup.out 2>&1 &
 - One can leave the container shell after running the website.
 - The configuration file `config.yaml` is used to configure the website. Please check the [Flamyngo](https://github.com/materialsvirtuallab/flamyngo) for more details.
 - The website will be running at `http://localhost:5000/` for r2SCAN and `http://localhost:5001/` for HSE. To change the port, please check the script `run-web.sh` for more details.
+
+# References for building the website
+- [Flamyngo](https://github.com/materialsvirtuallab/flamyngo)
+- [2dmatpedia](http://www.2dmatpedia.org)
+- [qubitPack](https://github.com/tsaie79/qubitPack.git)
