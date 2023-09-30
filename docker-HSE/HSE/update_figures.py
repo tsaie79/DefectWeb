@@ -173,7 +173,16 @@ def update_cdft_entries_in_db_and_generate_json(taskid=None, update_db=False):
     else:
         db_filter = {"task_label": "CDFT-B-HSE_scf", "prev_fw_taskid": taskid}
 
-    for doc in list(HSECDFT.collection.find(db_filter)):
+    entries = list(HSEDB.collection.find(db_filter))
+    def check_if_done(entry):
+        with cd(os.path.join(flamyngo_path, "static", "materials")):
+            if len(glob.glob(f"{entry['task_id']}_basic_info_df.json")) != 0:
+                return True
+            else:
+                return False
+    entries = [entry for entry in entries if not check_if_done(entry)]
+
+    for doc in entries:
         print("------------------"*5, doc["task_id"])
         owls = [2657, 2658, 2671, 2688, 2707, 2708]
         if doc["taskid"] in owls:
